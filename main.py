@@ -4,10 +4,9 @@ import csv
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QVBoxLayout,
                              QHBoxLayout, QLabel, QFileDialog, QLineEdit,
                              QDialog, QColorDialog, QSpinBox, QListWidget,
-                             QMessageBox, QInputDialog)
+                             QMessageBox, QInputDialog, QCheckBox, QComboBox)
 from PyQt5.QtGui import QPixmap, QImage, QColor
 from PyQt5.QtCore import Qt
-from PIL import Image, ImageDraw, ImageFont
 
 
 class MainWindow(QWidget):
@@ -53,6 +52,11 @@ class MainWindow(QWidget):
         self.templates_list = QListWidget()
         self.load_templates()
 
+        # Выбор темы
+        self.theme_combo = QComboBox()
+        self.theme_combo.addItems(["Светлая", "Темная", "Синяя", "Зеленая"])
+        self.theme_combo.currentIndexChanged.connect(self.apply_theme)
+
         # Компоновка
         hbox = QHBoxLayout()
         hbox.addWidget(self.screenshot_count_label)
@@ -71,17 +75,20 @@ class MainWindow(QWidget):
         vbox.addWidget(self.templates_list)
         vbox.addWidget(self.preview_btn)  # Кнопка предпросмотра
         vbox.addWidget(self.save_btn)
+        vbox.addWidget(self.theme_combo)  # Выбор темы
         # vbox.addWidget(self.image_label)  # Убираем из главного окна
 
         self.setLayout(vbox)
         self.setWindowTitle("Image Text App")
         self.setGeometry(300, 300, 600, 600)
 
+        # Изначально применяем светлую тему
+        self.apply_theme(0)
+
     def select_image(self):
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getOpenFileName(self, "Выберите изображение", "",
-                                                   "Images (*.png *.jpg *.jpeg *.bmp *.bmp);;All Files (*)",
-                                                   options=options)
+                                                  "Images (*.png *.jpg *.jpeg *.bmp *.bmp);;All Files (*)", options=options)
         if file_path:
             self.image_path = file_path
             self.image_selected_label.setText("Фотография выбрана!")
@@ -196,6 +203,185 @@ class MainWindow(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "Ошибка", f"Ошибка при создании предпросмотра: {e}")
 
+    def apply_theme(self, index):
+        theme_name = self.theme_combo.itemText(index)
+        if theme_name == "Светлая":
+            self.setStyleSheet(self.get_light_theme_style())
+            QApplication.instance().setStyleSheet(self.get_light_theme_style())
+        elif theme_name == "Темная":
+            self.setStyleSheet(self.get_dark_theme_style())
+            QApplication.instance().setStyleSheet(self.get_dark_theme_style())
+        elif theme_name == "Синяя":
+            self.setStyleSheet(self.get_blue_theme_style())
+            QApplication.instance().setStyleSheet(self.get_blue_theme_style())
+        elif theme_name == "Зеленая":
+            self.setStyleSheet(self.get_green_theme_style())
+            QApplication.instance().setStyleSheet(self.get_green_theme_style())
+
+    def get_light_theme_style(self):
+        return """
+            QWidget {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f0f0f0, stop:1 #fff);
+                color: #333;
+                font-family: Arial;
+                font-size: 14px;
+            }
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ddd, stop:1 #eee);
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 8px;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ccc, stop:1 #ddd);
+            }
+            QListWidget {
+                background-color: #f9f9f9;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px;
+            }
+            QSpinBox, QLineEdit {
+                background-color: #f9f9f9;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px;
+            }
+            QComboBox {
+                background-color: #f9f9f9;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 5px;
+            }
+        """
+
+    def get_dark_theme_style(self):
+        return """
+            QWidget {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #222, stop:1 #333);
+                color: #eee;
+                font-family: Arial;
+                font-size: 14px;
+            }
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #444, stop:1 #555);
+                border: 1px solid #666;
+                border-radius: 5px;
+                padding: 8px;
+                color: #eee;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #555, stop:1 #666);
+            }
+            QListWidget {
+                background-color: #444;
+                border: 1px solid #666;
+                border-radius: 5px;
+                padding: 5px;
+                color: #eee;
+            }
+            QSpinBox, QLineEdit {
+                background-color: #444;
+                border: 1px solid #666;
+                border-radius: 5px;
+                padding: 5px;
+                color: #eee;
+            }
+            QComboBox {
+                background-color: #444;
+                border: 1px solid #666;
+                border-radius: 5px;
+                padding: 5px;
+                color: #eee;
+            }
+        """
+
+    def get_blue_theme_style(self):
+        return """
+            QWidget {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #a6c0fe, stop:1 #f6f8fa);
+                color: #2e3a87;
+                font-family: Arial;
+                font-size: 14px;
+            }
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #5f75bd, stop:1 #a6c0fe);
+                border: 1px solid #879ddc;
+                border-radius: 5px;
+                padding: 8px;
+                color: #fff;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #7a91d4, stop:1 #b4c9f1);
+            }
+            QListWidget {
+                background-color: #e0eafa;
+                border: 1px solid #b4c9f1;
+                border-radius: 5px;
+                padding: 5px;
+                color: #2e3a87;
+            }
+            QSpinBox, QLineEdit {
+                background-color: #e0eafa;
+                border: 1px solid #b4c9f1;
+                border-radius: 5px;
+                padding: 5px;
+                color: #2e3a87;
+            }
+             QComboBox {
+                background-color: #e0eafa;
+                border: 1px solid #b4c9f1;
+                border-radius: 5px;
+                padding: 5px;
+                color: #2e3a87;
+            }
+        """
+
+    def get_green_theme_style(self):
+        return """
+            QWidget {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #c8e6c9, stop:1 #e8f5e9);
+                color: #1b5e20;
+                font-family: Arial;
+                font-size: 14px;
+            }
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #66bb6a, stop:1 #a5d6a7);
+                border: 1px solid #81c784;
+                border-radius: 5px;
+                padding: 8px;
+                color: #fff;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #7fca80, stop:1 #b7e1b9);
+            }
+            QListWidget {
+                background-color: #dcedc8;
+                border: 1px solid #a5d6a7;
+                border-radius: 5px;
+                padding: 5px;
+                color: #1b5e20;
+            }
+            QSpinBox, QLineEdit {
+                background-color: #dcedc8;
+                border: 1px solid #a5d6a7;
+                border-radius: 5px;
+                padding: 5px;
+                color: #1b5e20;
+            }
+            QComboBox {
+                background-color: #dcedc8;
+                border: 1px solid #a5d6a7;
+                border-radius: 5px;
+                padding: 5px;
+                color: #1b5e20;
+            }
+        """
+
 
 class LabelDialog(QDialog):
     def __init__(self, parent=None, label_data=None):
@@ -271,6 +457,13 @@ if __name__ == '__main__':
     import sys
 
     app = QApplication(sys.argv)
+    # Применяем светлую тему ко всему приложению
+    app.setStyleSheet("""
+        QWidget {
+            background-color: #fff;
+            color: #000;
+        }
+    """)
     main_window = MainWindow()
     MainWindow.image_path = None  # Добавляем атрибут класса
     main_window.show()
