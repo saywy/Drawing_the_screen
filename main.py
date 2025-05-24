@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QVBoxLayout,
                              QMessageBox, QInputDialog, QCheckBox, QComboBox)
 from PyQt5.QtGui import QPixmap, QImage, QColor
 from PyQt5.QtCore import Qt
-
+from PIL import Image, ImageDraw, ImageFont
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -143,7 +143,15 @@ class MainWindow(QWidget):
                 font = ImageFont.truetype("arial.ttf", label['size'])  # Укажите путь к шрифту
                 draw.text((label['x'], label['y']), label['text'], fill=label['color'], font=font)
 
-            file_name = os.path.join(self.save_path, f"{i}.png")
+            #  генерация уникального имени файла
+            base_name = "screenshot"  # Базовое имя файла
+            file_name = os.path.join(self.save_path, f"{base_name}.png")
+            counter = 1
+
+            while os.path.exists(file_name):
+                file_name = os.path.join(self.save_path, f"{base_name}_{counter}.png")
+                counter += 1
+
             image.save(file_name)
 
         QMessageBox.information(self, "Успех", f"{count} скриншотов сохранено в {self.save_path}")
